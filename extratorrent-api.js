@@ -231,7 +231,7 @@ module.exports = class ExtraTorrentAPI {
             var shiftVal = inputVal.split('=[0,255,')[1].split('];')[0];
         } catch(e) {
             console.warn('Invalid input for _parseImg2js!');
-            return;
+            return '';
         }
 
         return this._img2js(pngB64, shiftVal);
