@@ -6,6 +6,8 @@ const CryptoJS = require("crypto-js");
 const querystring = require('querystring');
 const request = require('request');
 
+const P_A_C_K_E_R = require('./lib/p_a_c_k_e_r_unpacker.js');
+
 const defaultOptions = {
   baseUrl: 'https://extratorrent.cc',
   timeout: 4 * 1000
@@ -114,7 +116,8 @@ module.exports = class ExtraTorrentAPI {
     const hashObject = $('div#e_content').text();
     const salt = JSON.parse(hashObject).s;
 
-    let temp = $('div#e_content + script').eq(0).text().split('function et(){')[1];
+    let temp = $('div#e_content + script').eq(0).text();
+    if(P_A_C_K_E_R.detect(temp)) temp = P_A_C_K_E_R.unpack(temp);
     temp = this._parseImg2js(temp);
 
     const newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
