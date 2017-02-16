@@ -7,6 +7,7 @@ const querystring = require('querystring');
 const request = require('request');
 
 const P_A_C_K_E_R = require('./lib/p_a_c_k_e_r_unpacker.js');
+const IMG2JS = require('./lib/img2js_unpacker.js');
 
 const defaultOptions = {
   baseUrl: 'https://extratorrent.cc',
@@ -118,16 +119,20 @@ module.exports = class ExtraTorrentAPI {
 
     let temp = $('div#e_content + script').eq(0).text();
     if(P_A_C_K_E_R.detect(temp)) temp = P_A_C_K_E_R.unpack(temp);
-    temp = this._parseImg2js(temp);
+    if(IMG2JS.detect(temp)) temp = IMG2JS.unpack(temp);
 
-    const newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
-    temp = temp.split('.decrypt(dd, f.s[')[1].split('{format:')[0];
-    const saltChar1 = temp.split(']')[0];
-    const saltDigits = temp.split("'")[1].split("'")[0];
-    const saltChar2 = temp.split('+f.s[')[1].split(']')[0];
+    try {
+      const newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
+      temp = temp.split('.decrypt(dd, f.s[')[1].split('{format:')[0];
+      const saltChar1 = temp.split(']')[0];
+      const saltDigits = temp.split("'")[1].split("'")[0];
+      const saltChar2 = temp.split('+f.s[')[1].split(']')[0];
+      const newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
 
-    const newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
-    const key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
+      const key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
+    } catch(e) {
+        console.warn(`Unable to extract the encryption key...`, e);
+    }
 
     const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
       format: CryptoJSAesJson
@@ -223,50 +228,5 @@ module.exports = class ExtraTorrentAPI {
       throw new Error(`Query needs to be an object or a string!`);
     }
   }
-  
-    _parseImg2js(inputVal)
-    {
-        try {
-            var pngB64 = 'iVBORw0KGgoAAAANSUhEU'+inputVal.split("'iVBORw0KGgoAAAANSUhEU")[1].split("'")[0];
-            var shiftVal = inputVal.split('=[0,255,')[1].split('];')[0];
-        } catch(e) {
-            console.warn('Invalid input for _parseImg2js!');
-            return '';
-        }
-
-        return this._img2js(pngB64, shiftVal);
-    }
-
-    _img2js(pngB64, shiftVal) {
-        console.log(pngB64.length, shiftVal);
-        if(!pngB64 || isNaN(shiftVal)) {
-            console.warn('Invalid input for _img2js!');
-            return '';
-        }
-        
-        var resultStr = '';
-
-        var imgObj = new window.Image();
-        imgObj.style.display = 'none';
-        imgObj.src = 'data:image/png;base64,'+pngB64;
-
-        var canvasEl = window.document.createElement('canvas');
-        canvasEl.width = imgObj.width;
-        canvasEl.height = imgObj.height;
-        canvasEl.style.display = 'none';
-
-        var canvasCtx = canvasEl.getContext('2d');
-        canvasCtx.drawImage(imgObj, 0, 0);
-
-        var imgData = canvasCtx.getImageData(0, 0, canvasEl.width, canvasEl.height);
-
-        for(var i=parseInt(shiftVal); i < imgData.data.length; i+=4) {
-            resultStr += (imgData.data[i] != 255) ? String.fromCharCode(imgData.data[i]) : ''; 
-        }
-        resultStr=resultStr.trim();
-
-        //console.log(window.atob(resultStr));
-        return unescape(decodeURIComponent(window.atob(resultStr)));
-    }
 
 }
