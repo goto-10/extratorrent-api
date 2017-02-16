@@ -122,14 +122,14 @@ module.exports = class ExtraTorrentAPI {
     if(IMG2JS.detect(temp)) temp = IMG2JS.unpack(temp);
 
     try {
-      const newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
+      let newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
       temp = temp.split('.decrypt(dd, f.s[')[1].split('{format:')[0];
-      const saltChar1 = temp.split(']')[0];
-      const saltDigits = temp.split("'")[1].split("'")[0];
-      const saltChar2 = temp.split('+f.s[')[1].split(']')[0];
-      const newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
+      let saltChar1 = temp.split(']')[0];
+      let saltDigits = temp.split("'")[1].split("'")[0];
+      let saltChar2 = temp.split('+f.s[')[1].split(']')[0];
+      let newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
 
-      const key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
+      var key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
     } catch(e) {
         console.warn(`Unable to extract the encryption key...`, e);
     }
