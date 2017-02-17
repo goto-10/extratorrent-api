@@ -122,17 +122,37 @@ module.exports = class ExtraTorrentAPI {
     if(IMG2JS.detect(temp)) temp = IMG2JS.unpack(temp);
 
     try {
-      let newsNr = temp.split("z+'s li a')[")[1].split(']')[0];
-      temp = temp.split('.decrypt(dd, f.s[')[1].split('{format:')[0];
-      let saltChar1 = temp.split(']')[0];
-      let saltDigits = temp.split("'")[1].split("'")[0];
-      let saltChar2 = temp.split('+f.s[')[1].split(']')[0];
-      let newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
+      let newsNr = temp.split("z+'s li a')[");
+      let plainKey = temp.split(".decrypt(ll.html(), '");
 
-      var key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
+      if(newsNr.length > 1) {
+          newsNr = newsNr[1].split(']')[0];
+
+          temp = temp.split('.decrypt(dd, f.s[')[1].split('{format:')[0];
+          let saltChar1 = temp.split(']')[0];
+          let saltDigits = temp.split("'")[1].split("'")[0];
+          let saltChar2 = temp.split('+f.s[')[1].split(']')[0];
+          let newsId = $('.ten_articles li a').eq(newsNr).attr('href').split('le/')[1].split('/')[0];
+
+          var key = salt[saltChar1] + saltDigits + '0' + newsId + salt[saltChar2];
+      }
+      else if(plainKey.length > 1) {
+          var key = plainKey[1].split("'")[0];
+      }
+      else {
+          if (this._debug) console.warn(`Unable to detect key elements...`);
+      }
     } catch(e) {
-        console.warn(`Unable to extract the encryption key...`, e);
+        if (this._debug) console.warn(`Unable to extract the encryption key...`, e);
     }
+    
+    if(!key) return {
+      response_time: 0,
+      page: 0,
+      total_results: 0,
+      total_pages: 0,
+      results: []
+    };
 
     const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
       format: CryptoJSAesJson
