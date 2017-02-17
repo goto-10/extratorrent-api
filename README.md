@@ -1,8 +1,8 @@
 # extratorrent-api
 
-[![Build Status](https://travis-ci.org/ChrisAlderson/extratorrent-api.svg?branch=master)]()
-[![Dependency Status](https://david-dm.org/ChrisAlderson/extratorrent-api.svg)](https://david-dm.org/ChrisAlderson/extratorrent-api)
-[![devDependency Status](https://david-dm.org/ChrisAlderson/extratorrent-api/dev-status.svg)](https://david-dm.org/ChrisAlderson/extratorrent-api#info=devDependencies)
+[![Build Status](https://travis-ci.org/goto-10/extratorrent-api.svg?branch=master)](https://travis-ci.org/goto-10/extratorrent-api)
+[![Dependency Status](https://david-dm.org/goto-10/extratorrent-api.svg)](https://david-dm.org/goto-10/extratorrent-api)
+[![devDependency Status](https://david-dm.org/goto-10/extratorrent-api/dev-status.svg)](https://david-dm.org/goto-10/extratorrent-api#info=devDependencies)
 
 An ExtraTorrent wrapper for NodeJS.
 
