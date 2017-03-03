@@ -10,9 +10,19 @@ const P_A_C_K_E_R = require('./lib/p_a_c_k_e_r_unpacker.js');
 const IMG2JS = require('./lib/img2js_unpacker.js');
 
 const defaultOptions = {
-  baseUrl: 'https://extratorrent.cc',
+  baseUrl: 'https://extra.to',
   timeout: 4 * 1000
 };
+/*
+https://extra.to
+https://etmirror.com
+https://etproxy.com
+https://extratorrentonline.com
+https://extratorrentlive.com
+https://extratorrent.works
+https://extratorrent.life
+https://extratorrent.one
+*/
 
 // taken from http://extratorrent.cc/scripts/main.js
 const CryptoJSAesJson = {
