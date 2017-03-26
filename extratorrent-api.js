@@ -124,40 +124,44 @@ module.exports = class ExtraTorrentAPI {
   _formatPage(res, page, date) {
     let $ = cheerio.load(res);
 
-    const hashObject = $('div#e_content').text();
-    const salt = JSON.parse(hashObject).s;
+    let e_content = $('div#e_content');
+    if(e_content.length > 0) {
+      const hashObject = e_content.text();
+      const salt = JSON.parse(hashObject).s;
 
-    let temp = $('div#e_content + script').eq(0).text();
-    if(P_A_C_K_E_R.detect(temp)) temp = P_A_C_K_E_R.unpack(temp);
-    if(IMG2JS.detect(temp)) temp = IMG2JS.unpack(temp);
+      let temp = $('div#e_content + script').eq(0).text();
+      if(P_A_C_K_E_R.detect(temp)) temp = P_A_C_K_E_R.unpack(temp);
+      if(IMG2JS.detect(temp)) temp = IMG2JS.unpack(temp);
 
-    try {
-      let plainKey = temp.replace(/\s/g,'').split(".html(),'");
+      try {
+        let plainKey = temp.replace(/\s/g,'').split(".html(),'");
 
-      if(plainKey.length > 1) {
-          var key = plainKey[1].split("'")[0];
+        if(plainKey.length > 1) {
+            var key = plainKey[1].split("'")[0];
+        }
+        else {
+            if (this._debug) console.warn(`Unable to detect key elements...`);
+        }
+      } catch(e) {
+          if (this._debug) console.warn(`Unable to extract the encryption key...`, e);
       }
-      else {
-          if (this._debug) console.warn(`Unable to detect key elements...`);
-      }
-    } catch(e) {
-        if (this._debug) console.warn(`Unable to extract the encryption key...`, e);
+
+      if(!key) return {
+        response_time: 0,
+        page: 0,
+        total_results: 0,
+        total_pages: 0,
+        results: []
+      };
+
+      const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
+        format: CryptoJSAesJson
+      }).toString(CryptoJS.enc.Utf8));
+
+      $ = cheerio.load(data);
     }
+    else const data = res;
     
-    if(!key) return {
-      response_time: 0,
-      page: 0,
-      total_results: 0,
-      total_pages: 0,
-      results: []
-    };
-
-    const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
-      format: CryptoJSAesJson
-    }).toString(CryptoJS.enc.Utf8));
-
-    $ = cheerio.load(data);
-
     const total_results = parseInt(data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1]);
     let total_pages = Math.ceil(total_results / 50);
     if (total_pages > 200) total_pages = 200;
