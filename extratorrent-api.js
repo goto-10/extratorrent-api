@@ -160,7 +160,9 @@ module.exports = class ExtraTorrentAPI {
 
       $ = cheerio.load(data);
     }
-    else const data = res;
+    else {
+      const data = res;
+    }
     
     const total_results = parseInt(data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1]);
     let total_pages = Math.ceil(total_results / 50);
