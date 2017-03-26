@@ -154,14 +154,14 @@ module.exports = class ExtraTorrentAPI {
         results: []
       };
 
-      const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
+      var data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
         format: CryptoJSAesJson
       }).toString(CryptoJS.enc.Utf8));
 
       $ = cheerio.load(data);
     }
     else {
-      const data = res;
+      var data = res;
     }
     
     const total_results = parseInt(data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1]);
