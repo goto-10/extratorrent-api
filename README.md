@@ -1,3 +1,6 @@
+# ExtraTorrent has shut down permanently
+## May 17, 2017
+
 # extratorrent-api
 
 [![Build Status](https://travis-ci.org/goto-10/extratorrent-api.svg?branch=master)](https://travis-ci.org/goto-10/extratorrent-api)
